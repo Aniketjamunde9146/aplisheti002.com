@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>User Registration</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
+  />
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@700&display=swap');
+    body {
+      font-family: 'Poppins', sans-serif;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex items-center justify-center bg-[#04282f] relative overflow-hidden">
+
+  <div class="absolute inset-0 bg-gradient-to-br from-[#04282f] to-[#02303a] opacity-80 -skew-y-12 origin-top-left"></div>
+
+  <main class="relative z-10 w-full max-w-lg px-8 text-white">
+
+    <h1 class="text-4xl font-extrabold text-center mb-12">USER REGISTRATION</h1>
+
+    <!-- Email/Password registration form -->
+    <form id="registerForm" class="space-y-12" onsubmit="handleEmailRegister(event)">
+      <div class="relative">
+        <input
+          id="fullName"
+          type="text"
+          placeholder="Full Name"
+          class="w-full bg-[#3f575d] text-[#04282f] text-xl rounded-full py-4 pl-6 pr-6 placeholder-[#04282f] focus:outline-none"
+          required
+        />
+      </div>
+      <div class="relative">
+        <input
+          id="email"
+          type="email"
+          placeholder="Email"
+          class="w-full bg-[#3f575d] text-[#04282f] text-xl rounded-full py-4 pl-24 pr-6 placeholder-[#04282f] focus:outline-none"
+          required
+        />
+        <div class="absolute left-0 top-1/2 -translate-y-1/2 bg-white rounded-full w-20 h-20 flex items-center justify-center">
+          <i class="fas fa-envelope text-[#04282f] text-3xl"></i>
+        </div>
+      </div>
+      <div class="relative">
+        <input
+          id="regPassword"
+          type="password"
+          placeholder="Password"
+          class="w-full bg-[#3f575d] text-[#04282f] text-xl rounded-full py-4 pl-6 pr-24 placeholder-[#04282f] focus:outline-none"
+          required
+          minlength="6"
+        />
+        <div class="absolute right-0 top-1/2 -translate-y-1/2 bg-white rounded-full w-20 h-20 flex items-center justify-center">
+          <i class="fas fa-lock text-[#04282f] text-3xl"></i>
+        </div>
+      </div>
+      <button
+        type="submit"
+        class="w-full bg-white text-[#04282f] text-2xl font-extrabold rounded-full py-5 mt-6"
+      >
+        REGISTER
+      </button>
+    </form>
+
+    <!-- Google Sign-In Button -->
+    <button
+      onclick="signInWithGoogle()"
+      type="button"
+      class="w-full bg-[#db4437] text-white text-2xl font-extrabold rounded-full py-5 mt-6 flex items-center justify-center gap-4"
+    >
+      <i class="fab fa-google text-3xl"></i> Register with Google
+    </button>
+
+    <!-- Phone Number OTP Registration -->
+    <div class="mt-10 bg-[#064a52] p-6 rounded-xl">
+      <h2 class="text-center text-xl font-bold mb-6">Register with Phone OTP</h2>
+      <input
+        id="phoneNumberReg"
+        type="tel"
+        placeholder="+91 12345 67890"
+        class="w-full bg-[#3f575d] text-[#e0f7f9] text-xl rounded-full py-4 px-6 mb-4 focus:outline-none"
+      />
+      <div id="recaptcha-container-reg" class="mb-4"></div>
+      <button
+        id="sendOtpBtnReg"
+        type="button"
+        onclick="sendOtpRegister(event)"
+        class="w-full bg-[#00a896] text-white text-2xl font-extrabold rounded-full py-4"
+      >
+        Send OTP
+      </button>
+
+      <input
+        id="otpInputReg"
+        type="text"
+        maxlength="6"
+        placeholder="Enter OTP"
+        class="w-full bg-[#3f575d] text-[#e0f7f9] text-xl rounded-full py-4 px-6 mt-6 mb-4 focus:outline-none hidden"
+      />
+      <button
+        id="verifyOtpBtnReg"
+        type="button"
+        onclick="verifyOtpRegister(event)"
+        class="w-full bg-[#00796b] text-white text-2xl font-extrabold rounded-full py-4 hidden"
+      >
+        Verify OTP
+      </button>
+    </div>
+
+    <p class="text-center mt-8">
+      Already have an account? 
+      <a href="login.html" class="text-[#00e5ff] font-bold underline">Login here</a>
+    </p>
+
+  </main>
+
+  <!-- Firebase SDK and app initialization -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, signInWithPhoneNumber, RecaptchaVerifier } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
+
+    // Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyCXDOOrIjPa_mMfZbvM97SSGrF8wUJ7sIk",
+      authDomain: "app-login-d46af.firebaseapp.com",
+      projectId: "app-login-d46af",
+      storageBucket: "app-login-d46af.appspot.com",  // fixed here
+      messagingSenderId: "955832442343",
+      appId: "1:955832442343:web:f8336c23e65adf3c18b142",
+      measurementId: "G-Q5K9M81MNJ"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    // Google sign-in provider
+    const provider = new GoogleAuthProvider();
+    provider.setCustomParameters({
+      client_id: "955832442343-kaj2jr2uq267717vrlu05serj42f1f0m.apps.googleusercontent.com"
+    });
+
+    window.signInWithGoogle = async () => {
+      try {
+        const result = await signInWithPopup(auth, provider);
+        const user = result.user;
+        alert(`Welcome ${user.displayName || user.email}`);
+        localStorage.setItem('userName', user.displayName || user.email);
+        window.location.href = 'main.html';
+      } catch (error) {
+        alert("Google Sign-In failed: " + error.message);
+      }
+    };
+
+    // Email/password registration handler
+    window.handleEmailRegister = async (event) => {
+      event.preventDefault();
+
+      const fullName = document.getElementById('fullName').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('regPassword').value;
+
+      if (!fullName || !email || !password) {
+        alert('Please fill all fields');
+        return;
+      }
+      if (password.length < 6) {
+        alert('Password must be at least 6 characters');
+        return;
+      }
+
+      try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+        alert(`Registration successful! Welcome, ${fullName}`);
+        localStorage.setItem('userName', fullName);
+        window.location.href = 'main.html';
+      } catch (error) {
+        alert('Registration failed: ' + error.message);
+      }
+    };
+
+    // Initialize reCAPTCHA
+    window.onload = () => {
+      window.recaptchaVerifierReg = new RecaptchaVerifier('recaptcha-container-reg', {
+        'size': 'invisible',
+        'callback': (response) => {
+          console.log('reCAPTCHA resolved');
+        }
+      }, auth);
+    };
+
+    // Send OTP for phone registration
+    window.sendOtpRegister = (event) => {
+      event.preventDefault();
+
+      const phoneNumber = document.getElementById('phoneNumberReg').value.trim();
+      if (!phoneNumber.match(/^\+\d{10,15}$/)) {
+        alert('Please enter phone number in international format, e.g. +911234567890');
+        return;
+      }
+
+      const appVerifier = window.recaptchaVerifierReg;
+
+      signInWithPhoneNumber(auth, phoneNumber, appVerifier)
+        .then((confirmationResult) => {
+          window.confirmationResultReg = confirmationResult;
+          alert('OTP sent! Check your phone.');
+          document.getElementById('otpInputReg').classList.remove('hidden');
+          document.getElementById('verifyOtpBtnReg').classList.remove('hidden');
+          document.getElementById('sendOtpBtnReg').disabled = true;
+        }).catch((error) => {
+          alert('Error sending OTP: ' + error.message);
+        });
+    };
+
+    // Verify OTP for phone registration
+    window.verifyOtpRegister = (event) => {
+      event.preventDefault();
+
+      const code = document.getElementById('otpInputReg').value.trim();
+      if (code.length !== 6) {
+        alert('Please enter a 6-digit OTP code');
+        return;
+      }
+      window.confirmationResultReg.confirm(code)
+        .then((result) => {
+          const user = result.user;
+          alert('Phone authentication successful, welcome ' + (user.phoneNumber || 'user') + '!');
+          localStorage.setItem('userPhone', user.phoneNumber);
+          window.location.href = 'main.html';
+        }).catch((error) => {
+          alert('Invalid OTP: ' + error.message);
+        });
+    };
+  </script>
+
+</body>
+</html>

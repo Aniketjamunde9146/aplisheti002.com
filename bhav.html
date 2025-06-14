@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="mr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>मालाचे भाव</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 20px;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        background-image: url("bg.png");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        position: relative;
+        color: #2c3e50;
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(255, 255, 255, 0.5);
+        z-index: -1;
+      }
+
+      /* Header area */
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      header h1 {
+        font-size: 2rem;
+        font-weight: bold;
+        margin: 0;
+        flex-grow: 1;
+        min-width: 150px;
+      }
+
+      button.go-back {
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        white-space: nowrap;
+      }
+
+      button.go-back:hover {
+        background-color: #388e3c;
+      }
+
+      /* Container for cards - scrollable on small screens */
+      .cards-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 20px;
+        overflow-y: auto;
+        flex-grow: 1;
+        max-height: calc(100vh - 100px); /* Leave space for header + padding */
+        padding-right: 10px;
+      }
+
+      .product-card {
+        background: rgba(255, 255, 255, 0.85);
+        width: 250px;
+        border-radius: 12px;
+        box-shadow: 0 4px 8px rgb(0 0 0 / 0.1);
+        padding: 20px;
+        text-align: center;
+        transition: transform 0.3s ease;
+        backdrop-filter: blur(5px);
+        flex-shrink: 0;
+      }
+
+      .product-card:hover {
+        transform: translateY(-8px);
+      }
+
+      .header {
+        font-weight: bold;
+        font-size: 1.5rem;
+        margin-bottom: 15px;
+        color: #2c3e50;
+      }
+
+      .product-image {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-bottom: 15px;
+        border: 4px solid #4caf50;
+      }
+
+      .price {
+        font-size: 1.3rem;
+        color: #27ae60;
+        margin-bottom: 10px;
+        font-weight: 600;
+      }
+
+      .info {
+        font-size: 0.95rem;
+        color: #555;
+        line-height: 1.4;
+      }
+
+      /* Responsive adjustments */
+      @media (max-width: 600px) {
+        body {
+          padding: 10px;
+        }
+        header h1 {
+          font-size: 1.5rem;
+          text-align: center;
+          flex-basis: 100%;
+        }
+        button.go-back {
+          flex-basis: 100%;
+          margin-bottom: 10px;
+        }
+        .cards-container {
+          max-height: none;
+          flex-direction: column;
+          overflow-y: visible;
+        }
+        .product-card {
+          width: 100%;
+          max-width: 350px;
+          margin: 0 auto;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <button class="go-back" onclick="goBack()">मागे जा</button>
+      <h1>मालाचे भाव</h1>
+    </header>
+
+    <div class="cards-container">
+      <div class="product-card">
+        <div class="header">सोयाबीन</div>
+        <img class="product-image" src="soyabin.png" alt="सोयाबीन" />
+        <div class="price">₹ 2,300/ क्विंटल</div>
+        <div class="info">
+          उच्च प्रतीची सोयाबीन बियाणे, तेल काढण्यासाठी आणि प्राण्यांच्या
+          आहारासाठी योग्य.
+        </div>
+      </div>
+
+      <div class="product-card">
+        <div class="header">मक्का</div>
+        <img class="product-image" src="makk.png" alt="मक्का" />
+        <div class="price">₹ 1,800 / क्विंटल</div>
+        <div class="info">उत्कृष्ट मका, पीठ आणि बेकरीसाठी उपयुक्त.</div>
+      </div>
+
+      <div class="product-card">
+        <div class="header">गहू</div>
+        <img class="product-image" src="gahu.png" alt="गहू" />
+        <div class="price">₹ 2,000 / क्विंटल</div>
+        <div class="info">
+          सुगंधी आणि लांबदंड गहू, स्वयंपाक आणि निर्यातासाठी उत्कृष्ट.
+        </div>
+      </div>
+
+      <div class="product-card">
+        <div class="header">कापूस</div>
+        <img class="product-image" src="kapus.png" alt="कापूस" />
+        <div class="price">₹ 1,600 / क्विंटल</div>
+        <div class="info">
+          ताजा पिवळा कापूस, पशुधनासाठी आणि अन्न प्रक्रिया साठी योग्य.
+        </div>
+      </div>
+
+      <div class="product-card">
+        <div class="header">ज्वारी</div>
+        <img class="product-image" src="jwari.png" alt="ज्वारी" />
+        <div class="price">₹ 1,500 / क्विंटल</div>
+        <div class="info">
+          पौष्टिक ज्वारी, मद्यनिर्मिती आणि आरोग्यदायी अन्नासाठी वापरली जाते.
+        </div>
+      </div>
+
+      <div class="product-card">
+        <div class="header">बाजरी</div>
+        <img class="product-image" src="bajari.png" alt="बाजरी" />
+        <div class="price">₹ 1,500 / क्विंटल</div>
+        <div class="info">
+          पौष्टिक बाजरी, विविध आरोग्यदायी पदार्थांमध्ये वापरली जाते.
+        </div>
+      </div>
+
+      <div class="product-card">
+        <div class="header">मिरची</div>
+        <img class="product-image" src="mirchi.png" alt="मिरची" />
+        <div class="price">₹ 1,500 / क्विंटल</div>
+        <div class="info">
+          तिखट आणि ताजी मिरची, जेवणात चव वाढवण्यासाठी उपयुक्त.
+        </div>
+      </div>
+
+      <div class="product-card">
+        <div class="header">हरबरा</div>
+        <img class="product-image" src="harbara.png" alt="हरबरा" />
+        <div class="price">₹ 1,500 / क्विंटल</div>
+        <div class="info">पौष्टिक हरबरा, शिजवण्यासाठी आणि सलाडसाठी योग्य.</div>
+      </div>
+    </div>
+
+    <script>
+      function goBack() {
+        // menu.html वर परत जाण्यासाठी
+        window.location.href = "main.html";
+      }
+    </script>
+  </body>
+</html>

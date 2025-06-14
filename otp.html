@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Login with OTP</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-[#04282f] flex items-center justify-center min-h-screen text-white">
+
+  <div class="max-w-md w-full p-8 bg-[#064a52] rounded-xl">
+
+    <h1 class="text-3xl font-bold mb-8 text-center">Login</h1>
+
+      <input
+        id="phoneNumberLogin"
+        type="tel"
+        placeholder="+91 1234567890"
+        class="w-full p-4 mb-4 rounded-full text-[#04282f]"
+      />
+
+      <button
+        id="sendOtpBtnLogin"
+        onclick="sendOtpLogin()"
+        class="w-full bg-[#00a896] py-4 rounded-full mb-4 font-bold"
+      >
+        Send OTP
+      </button>
+
+      <input
+        id="otpInputLogin"
+        type="text"
+        maxlength="6"
+        placeholder="Enter OTP"
+        class="w-full p-4 mb-4 rounded-full text-[#04282f] hidden"
+      />
+
+      <button
+        id="verifyOtpBtnLogin"
+        onclick="verifyOtpLogin()"
+        class="w-full bg-[#00796b] py-4 rounded-full font-bold hidden"
+      >
+        Verify OTP
+      </button>
+
+    </div>
+
+    <div id="recaptcha-container"></div>
+
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js";
+    import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCXDOOrIjPa_mMfZbvM97SSGrF8wUJ7sIk",
+      authDomain: "app-login-d46af.firebaseapp.com",
+      projectId: "app-login-d46af",
+      storageBucket: "app-login-d46af.firebasestorage.app",
+      messagingSenderId: "955832442343",
+      appId: "1:955832442343:web:f8336c23e65adf3c18b142",
+      measurementId: "G-Q5K9M81MNJ"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    window.onload = () => {
+      window.recaptchaVerifier = new RecaptchaVerifier('recaptcha-container', {
+        size: 'invisible',
+        callback: (response) => {
+          console.log('reCAPTCHA verified');
+        }
+      }, auth);
+    };
+
+    window.showOtpLogin = () => {
+      const otpSection = document.getElementById('otpLoginSection');
+      otpSection.classList.toggle('hidden');
+    };
+
+    window.sendOtpLogin = () => {
+      const phoneNumber = document.getElementById('phoneNumberLogin').value;
+      if (!phoneNumber.match(/^\+\d{10,15}$/)) {
+        alert('Enter valid phone number with country code, e.g. +911234567890');
+        return;
+      }
+
+      signInWithPhoneNumber(auth, phoneNumber, window.recaptchaVerifier)
+        .then(confirmationResult => {
+          window.confirmationResult = confirmationResult;
+          alert('OTP sent!');
+          document.getElementById('otpInputLogin').classList.remove('hidden');
+          document.getElementById('verifyOtpBtnLogin').classList.remove('hidden');
+          document.getElementById('sendOtpBtnLogin').disabled = true;
+        })
+        .catch(error => alert('Failed to send OTP: ' + error.message));
+    };
+
+    window.verifyOtpLogin = () => {
+      const otp = document.getElementById('otpInputLogin').value;
+      if (otp.length !== 6) {
+        alert('Enter 6-digit OTP');
+        return;
+      }
+
+      window.confirmationResult.confirm(otp)
+        .then(result => {
+          const user = result.user;
+          alert('Logged in successfully!');
+          localStorage.setItem('userName', user.phoneNumber);
+          window.location.href = 'main.html';
+        })
+        .catch(error => alert('OTP verification failed: ' + error.message));
+    };
+  </script>
+
+</body>
+</html>
