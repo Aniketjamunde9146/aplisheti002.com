@@ -63,7 +63,9 @@
       const rain1h = data.rain?.['1h'] || 0;
       const rain3h = data.rain?.['3h'] || 0;
       const rainChance = rain1h || rain3h;
-      const rainText = rainChance ? `🌧 पाऊस शक्यता: ${rainChance.toFixed(1)} मिमी` : `🌤 पाऊस नाही`;
+      const rainText = rainChance
+        ? `🌧 पाऊस शक्यता: ${rainChance.toFixed(1)} मिमी`
+        : `🌤 पाऊस नाही`;
 
       if (rainChance > 0) {
         alertBox.classList.remove('hidden');
@@ -90,10 +92,12 @@
           if (data.cod === 200) {
             displayWeather(data);
           } else {
-            fallbackWeather();
+            console.warn("API returned error:", data);
           }
         })
-        .catch(() => fallbackWeather());
+        .catch(err => {
+          console.error("Fetch error:", err);
+        });
     }
 
     function fallbackWeather() {
@@ -130,6 +134,10 @@
     }
 
     async function setUserLocationAndLoadWeather() {
+      // Step 1: Show default (Bhokardan)
+      fallbackWeather();
+
+      // Step 2: Try saved address
       const savedAddress = localStorage.getItem("address");
       if (savedAddress && savedAddress !== "पत्ता उपलब्ध नाही") {
         try {
@@ -137,11 +145,11 @@
           fetchWeather(coords.lat, coords.lon);
           return;
         } catch {
-          fallbackWeather();
-          return;
+          // Use fallback only
         }
       }
 
+      // Step 3: Try browser GPS
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
           async (pos) => {
@@ -151,11 +159,11 @@
             localStorage.setItem("address", address);
             fetchWeather(lat, lon);
           },
-          () => fallbackWeather(),
+          () => {
+            // Ignore error, fallback already shown
+          },
           { timeout: 5000 }
         );
-      } else {
-        fallbackWeather();
       }
     }
   </script>
