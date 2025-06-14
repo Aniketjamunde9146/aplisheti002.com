@@ -63,7 +63,7 @@
       const rain1h = data.rain?.['1h'] || 0;
       const rain3h = data.rain?.['3h'] || 0;
       const rainChance = rain1h || rain3h;
-      const rainText = rainChance ? 🌧 पाऊस शक्यता: ${rainChance.toFixed(1)} मिमी : 🌤 पाऊस नाही;
+      const rainText = rainChance ? `🌧 पाऊस शक्यता: ${rainChance.toFixed(1)} मिमी` : `🌤 पाऊस नाही`;
 
       if (rainChance > 0) {
         alertBox.classList.remove('hidden');
@@ -72,7 +72,7 @@
         alertBox.classList.add('hidden');
       }
 
-      el.innerHTML = 
+      el.innerHTML = `
         <img src="https://openweathermap.org/img/wn/${data.weather[0].icon}@2x.png" alt="आयकॉन्स" class="mx-auto" />
         <p class="text-xl font-semibold">${data.name}</p>
         <p class="capitalize text-sm text-gray-600">${data.weather[0].description}</p>
@@ -80,11 +80,11 @@
         <p class="text-base">💧 आर्द्रता: ${data.main.humidity}%</p>
         <p class="text-base">🌬 वारा वेग: ${data.wind.speed} मी/से</p>
         <p class="text-base font-medium text-blue-600">${rainText}</p>
-      ;
+      `;
     }
 
     function fetchWeather(lat, lon) {
-      fetch(https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric&lang=mr)
+      fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric&lang=mr`)
         .then(res => res.json())
         .then(data => {
           if (data.cod === 200) {
@@ -102,7 +102,7 @@
 
     function fetchCoordsFromAddress(address) {
       const encodedAddress = encodeURIComponent(address);
-      return fetch(https://api.openweathermap.org/geo/1.0/direct?q=${encodedAddress}&limit=1&appid=${API_KEY})
+      return fetch(`https://api.openweathermap.org/geo/1.0/direct?q=${encodedAddress}&limit=1&appid=${API_KEY}`)
         .then(res => res.json())
         .then(data => {
           if (data && data.length > 0) {
@@ -114,9 +114,7 @@
 
     async function fetchAddressFromCoords(lat, lon) {
       try {
-        const response = await fetch(
-          https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}
-        );
+        const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}`);
         if (!response.ok) throw new Error("Reverse geocoding failed");
         const data = await response.json();
         return (
@@ -139,7 +137,6 @@
           fetchWeather(coords.lat, coords.lon);
           return;
         } catch {
-          // fallback if stored address coords fetch fails
           fallbackWeather();
           return;
         }
